@@ -34,21 +34,21 @@ def start_quiz(difficulty):
     if not st.session_state['done']:
         st.progress(st.session_state['quiz_id']/len(df_questions))
 
-        row = df_questions.iloc[st.session_state.quiz_id]
-        st.subheader(f"Q{st.session_state.quiz_id + 1}. {row['question']}")
+        question = df_questions.iloc[st.session_state.quiz_id]
+        st.subheader(f"문제{st.session_state.quiz_id + 1}. {question['question']}")
         if not st.session_state['answered']:
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("O"):
-                    submit_answer("O", row['answer'], row['id'])
+                    submit_answer("O", question['answer'], question['id'])
             with col2:
                 if st.button("X"):
-                    submit_answer("X", row['answer'], row['id'])
+                    submit_answer("X", question['answer'], question['id'])
         else:
             if st.session_state.get('is_correct'):
-                st.success(row['why'])
+                st.success(question['why'])
             else:
-                st.error(row['why'])
+                st.error(question['why'])
 
             if st.button('확인'):
                 st.session_state['answered'] = False # 상태 초기화
@@ -96,7 +96,7 @@ def show_result(df_len, df_questions):
     st.header('퀴즈를 모두 풀었습니다!')
     
     score = st.session_state['score']
-    st.subheader(f"당신의 점수는: {int(score/df_len * 100)}입니다")
+    st.subheader(f"당신의 점수는: {int(score/df_len * 100)}점 입니다")
     
     if not st.session_state['record_saved']:
         save_record(st.session_state.get('user_id', 'unknown'), score, df_len, st.session_state['fail_quiz'], st.session_state.get('difficulty'))
@@ -121,10 +121,10 @@ def show_review(df_questions):
         st.info('틀린 문제가 없습니다!')
     else:
         # iterrows()를 사용해 데이터프레임의 행을 하나씩 반복하며 출력
-        for idx, row in df_wrong.iterrows():
-            with st.expander(f"Q. {row['question']}", expanded=True):
-                st.write(f"**정답:** {row['answer']}")
-                st.info(f"**해설:** {row['why']}")
+        for idx, question in df_wrong.iterrows():
+            with st.expander(f"문제: {question['question']}", expanded=True):
+                st.write(f"**정답:** {question['answer']}")
+                st.info(f"**해설:** {question['why']}")
     if st.button('처음부터 다시 풀기'):
         reset_quiz()
         st.rerun()
