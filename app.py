@@ -14,6 +14,7 @@ st.set_page_config(
 id_pw = {
     'id': 'pw',
     'abcd': '1234',
+    'heewoo':'1234'
 }
 
 if 'login' not in st.session_state:
@@ -45,48 +46,51 @@ else:
     # ===================================
     # 로그인 상태가 True일 때 화면 - 퀴즈
     # ===================================
-    with st.sidebar:
-        if st.button('로그아웃'):
+    init_session_state()
+    
+    col1, col2 = st.columns([8,1])
+    with col2:
+        if st.button('logout'):
             st.session_state['login'] = False
             st.session_state['user_id'] = None
             reset_quiz()
             st.rerun()
-    init_session_state()
-    
-    if st.session_state['difficulty'] is None:
-        st.title('문제 난이도를 선택해주세요.')
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button('기본 문제'):
-                st.session_state['difficulty'] = 'basic'
-                st.rerun()
-        with col2:
-            if st.button('심화 문제'):
-                st.session_state['difficulty'] = 'hard'
-                st.rerun()
-                
-        try:
-            df_records = pd.read_csv('user_records.csv')
-            user_data = df_records[df_records['user_id'] == st.session_state['user_id']]
-            if not user_data.empty:
-                st.divider()
-                st.subheader('내 문제 풀이 기록')
-                
-                basic_data = user_data[user_data['difficulty'] == 'basic']['score'].reset_index(drop=True)
-                hard_data = user_data[user_data['difficulty'] == 'hard']['score'].reset_index(drop=True)
-                
-                chart_data = pd.DataFrame({
-                    '기본 문제': basic_data,
-                    '심화 문제': hard_data
-                })
-                chart_data.index = range(1, len(chart_data) + 1)
-                st.line_chart(chart_data)
-        except Exception:
-            pass
-    else:
-        df_questions = load_data(st.session_state['difficulty'])
-        
-        if st.session_state['review_mode']:
-            show_review(df_questions)
+
+    with col1:
+        if st.session_state['difficulty'] is None:
+            st.title('문제 난이도를 선택해주세요.')
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button('기본 문제'):
+                    st.session_state['difficulty'] = 'basic'
+                    st.rerun()
+            with col2:
+                if st.button('심화 문제'):
+                    st.session_state['difficulty'] = 'hard'
+                    st.rerun()
+
+            try:
+                df_records = pd.read_csv('user_records.csv')
+                user_data = df_records[df_records['user_id'] == st.session_state['user_id']]
+                if not user_data.empty:
+                    st.divider()
+                    st.subheader('내 문제 풀이 기록')
+
+                    basic_data = user_data[user_data['difficulty'] == 'basic']['score'].reset_index(drop=True)
+                    hard_data = user_data[user_data['difficulty'] == 'hard']['score'].reset_index(drop=True)
+
+                    chart_data = pd.DataFrame({
+                        '기본 문제': basic_data,
+                        '심화 문제': hard_data
+                    })
+                    chart_data.index = range(1, len(chart_data) + 1)
+                    st.line_chart(chart_data)
+            except Exception:
+                pass
         else:
-            start_quiz(st.session_state['difficulty'])
+            df_questions = load_data(st.session_state['difficulty'])
+
+            if st.session_state['review_mode']:
+                show_review(df_questions)
+            else:
+                start_quiz(st.session_state['difficulty'])

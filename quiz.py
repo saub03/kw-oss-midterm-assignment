@@ -66,12 +66,10 @@ def submit_answer(choice, answer, quiz_id):
     if choice == answer:
         st.session_state['score'] += 1
         st.session_state['is_correct'] = True
-        st.toast('정답입니다!')
     else:
         st.session_state['is_correct'] = False
         if quiz_id not in st.session_state['fail_quiz']:
             st.session_state['fail_quiz'].append(quiz_id)
-        st.toast('오답입니다!')
     st.rerun()
 
 def save_record(user_id, score, total, fail_quiz, difficulty):
