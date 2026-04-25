@@ -28,8 +28,8 @@ def init_session_state():
         st.session_state['record_saved'] = False
     if 'difficulty' not in st.session_state:
         st.session_state['difficulty'] = None
-def start_quiz(difficulty):
 
+def start_quiz(difficulty):
     df_questions = load_data(difficulty)
     if not st.session_state['done']:
         st.progress(st.session_state['quiz_id']/len(df_questions))
